@@ -24,8 +24,19 @@ local function draw2(graphic_command_channel: love.thread.Thread)
     -- Как понять сколько можно доставать результатов?
 end
 
+--[[
+local function draw(): string
+    return "gr.clear(0.5, 0.5, 0.5)" ..
+    "gr.setColor{0, 0, 0}" ..
+    "gr.print("TestTest")"
+end
+--]]
+
 local function draw(): string
     return [[
+    local mpos = graphic_command_channel:demand()
+    local ups = graphic_command_channel:demand()
+
     gr.clear(0.5, 0.5, 0.5)
     gr.setColor{0, 0, 0}
     gr.print("TestTest")
@@ -66,11 +77,17 @@ end
 --local function wheelmoved(x: number, y: number)
 --end
 
+local function getSceneType(): string
+    --print("i am called")
+    return "multi"
+end
+
 return {
     init = init,
     quit = quit,
     draw = draw,
     --drawui = drawui,
+    getSceneType = getSceneType,
     update = update,
     keypressed = keypressed,
     --mousemoved = mousemoved,

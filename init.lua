@@ -8,7 +8,7 @@ local i18n = require("i18n")
 
 
 
-local gr = love.graphics
+
 
 
 
@@ -20,10 +20,24 @@ local gr = love.graphics
 local function drawui()
 end
 
+local function draw2(graphic_command_channel)
+
+end
+
+
+
+
+
+
+
+
+
 local function draw()
-   gr.clear(0.5, 0.5, 0.5)
-   gr.setColor({ 0, 0, 0 })
-   gr.print("TestTest")
+   return [[
+    gr.clear(0.5, 0.5, 0.5)
+    gr.setColor{0, 0, 0}
+    gr.print("TestTest")
+    ]]
 end
 
 local function update()
@@ -60,11 +74,17 @@ end
 
 
 
+local function getSceneType()
+   print("i am called")
+   return "multi"
+end
+
 return {
    init = init,
    quit = quit,
    draw = draw,
-   drawui = drawui,
+
+   getSceneType = getSceneType,
    update = update,
    keypressed = keypressed,
 
