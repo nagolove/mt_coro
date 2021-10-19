@@ -32,6 +32,12 @@ local mx, my = 0, 0
 local time = love.timer.getTime()
 local dt = 0.
 
+
+
+
+
+
+
 local rendercode = [[
 local s: integer = 1
 local y = graphic_command_channel:demand()

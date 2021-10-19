@@ -32,6 +32,12 @@ local mx, my = 0, 0
 local time = love.timer.getTime()
 local dt = 0.
 
+-- Как часто перекомпилировать код рисовки?
+-- Варианты - 
+--  * по таймеру
+--  * используя метод :peek() на каждой итерации цикла
+-- Сейчас функция компилируется один раз при загрузке файла исходного текста
+-- потока.
 local rendercode = [[
 local s: integer = 1
 local y = graphic_command_channel:demand()
