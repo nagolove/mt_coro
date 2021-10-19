@@ -4,6 +4,8 @@ print('hello. I scene from separated thread')
 require "love"
 require "love_inc".require()
 
+--require "love.timer"
+
 love.filesystem.setRequirePath("?.lua;?/init.lua;scenes/empty/?.lua")
 local i18n = require "i18n"
 
@@ -35,12 +37,13 @@ local time = love.timer.getTime()
 local dt = 0.
 
 local rendercode = [[
---local mpos = graphic_command_channel:demand()
---local ups = graphic_command_channel:demand()
+local y = graphic_command_channel:demand()
+local x = graphic_command_channel:demand()
 
+local gr = love.graphics
 gr.clear(0.5, 0.5, 0.5)
 gr.setColor{0, 0, 0}
-gr.print("TestTest")
+gr.print("TestTest", x, y)
 ]]
 
 graphic_code_channel:push(rendercode)
@@ -59,7 +62,7 @@ local function init()
     })
     print("translated", i18n.translate('welcome'))
     print("translated", i18n('welcome'))
-    graphic_command_channel:push(rendercode)
+    graphic_code_channel:push(rendercode)
 end
 
 init()
@@ -93,12 +96,18 @@ while true do
     dt = nt - time
     time = nt
 
+    --print('hi from thread')
+
     --print("before draw_ready_channel:peek()")
     if draw_ready_channel:peek() then
         print('thread drawing')
         -- Как передавать данные?
         --graphic_command_channel:push({ mx, my })
         --graphic_command_channel:push(tostring( math.floor( 1 / dt ) ) )
+
+        local x, y = love.mouse.getPosition()
+        graphic_command_channel:push(y)
+        graphic_command_channel:push(x)
 
         local res = draw_ready_channel:pop() as string
         if res ~= "ready" then

@@ -4,6 +4,8 @@ local _tl_compat; if (tonumber((_VERSION or ''):match('[%d.]*$')) or 0) < 5.3 th
 require("love")
 require("love_inc").require()
 
+
+
 love.filesystem.setRequirePath("?.lua;?/init.lua;scenes/empty/?.lua")
 local i18n = require("i18n")
 
@@ -38,9 +40,13 @@ local rendercode = [[
 --local mpos = graphic_command_channel:demand()
 --local ups = graphic_command_channel:demand()
 
+local y = graphic_command_channel:demand()
+local x = graphic_command_channel:demand()
+
+local gr = love.graphics
 gr.clear(0.5, 0.5, 0.5)
 gr.setColor{0, 0, 0}
-gr.print("TestTest")
+gr.print("TestTest", x, y)
 ]]
 
 graphic_code_channel:push(rendercode)
@@ -59,7 +65,7 @@ local function init()
    })
    print("translated", i18n.translate('welcome'))
    print("translated", i18n('welcome'))
-   graphic_command_channel:push(rendercode)
+   graphic_code_channel:push(rendercode)
 end
 
 init()
@@ -94,11 +100,17 @@ while true do
    time = nt
 
 
+
+
    if draw_ready_channel:peek() then
       print('thread drawing')
 
 
 
+
+      local x, y = love.mouse.getPosition()
+      graphic_command_channel:push(y)
+      graphic_command_channel:push(x)
 
       local res = draw_ready_channel:pop()
       if res ~= "ready" then
