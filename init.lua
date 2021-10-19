@@ -22,14 +22,10 @@ local i18n = require("i18n")
 
 
 
-
-
 local event_channel = love.thread.getChannel("event_channel")
 local draw_ready_channel = love.thread.getChannel("draw_ready_channel")
 local graphic_command_channel = love.thread.getChannel("graphic_command_channel")
 local graphic_code_channel = love.thread.getChannel("graphic_code_channel")
-
-local accum = 0
 
 local mx, my = 0, 0
 
@@ -37,9 +33,7 @@ local time = love.timer.getTime()
 local dt = 0.
 
 local rendercode = [[
---local mpos = graphic_command_channel:demand()
---local ups = graphic_command_channel:demand()
-
+local s: integer = 1
 local y = graphic_command_channel:demand()
 local x = graphic_command_channel:demand()
 
@@ -99,11 +93,7 @@ while true do
    dt = nt - time
    time = nt
 
-
-
-
    if draw_ready_channel:peek() then
-      print('thread drawing')
 
 
 
@@ -117,7 +107,6 @@ while true do
          error("Bad message in draw_ready_channel: " .. res)
       end
    end
-
 
    love.timer.sleep(0.001)
 end
