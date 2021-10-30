@@ -56,7 +56,7 @@ local s: integer = 1
 local y = graphic_command_channel:demand()
 local x = graphic_command_channel:demand()
 
---local z
+delkwffj
 --z = 1
 --z = "hi"
 
@@ -65,8 +65,6 @@ gr.clear(0.5, 0.5, 0.5)
 gr.setColor{0, 0, 0}
 gr.print("TestTest", x, y)
 ]]
-
-graphic_code_channel:push(rendercode)
 
 local function init()
     i18n.set('en.welcome', 'welcome to this program')
@@ -116,7 +114,17 @@ while true do
     dt = nt - time
     time = nt
 
-    if draw_ready_channel:peek() then
+    local is_ready: string = draw_ready_channel:peek() as string
+    if is_ready then
+        if type(is_ready) ~= 'string' then
+            error("Type error in is_ready flag")
+        end
+        if is_ready ~= "ready" then
+            local msg = tostring(is_ready) or ""
+            error("Bad message in draw_ready_channel: " .. msg)
+        end
+        draw_ready_channel:pop()
+
         -- Как передавать данные?
         --graphic_command_channel:push({ mx, my })
         --graphic_command_channel:push(tostring( math.floor( 1 / dt ) ) )
@@ -136,10 +144,6 @@ while true do
         pipeline:leave()
         --]]
 
-        local res = draw_ready_channel:pop() as string
-        if res ~= "ready" then
-            error("Bad message in draw_ready_channel: " .. res)
-        end
     end
 
     love.timer.sleep(0.001)

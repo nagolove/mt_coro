@@ -32,6 +32,18 @@ local mx, my = 0, 0
 local time = love.timer.getTime()
 local dt = 0.
 
+local Pipeline = {}
+
+
+
+
+
+
+
+
+
+local pipeline = Pipeline.new()
+
 
 
 
@@ -40,20 +52,19 @@ local dt = 0.
 
 local rendercode = [[
 local s: integer = 1
+-- Как понять, что используются данные из нужного потока?
 local y = graphic_command_channel:demand()
 local x = graphic_command_channel:demand()
 
-local z
-z = 1
-z = "hi"
+delkwffj
+--z = 1
+--z = "hi"
 
 local gr = love.graphics
 gr.clear(0.5, 0.5, 0.5)
 gr.setColor{0, 0, 0}
 gr.print("TestTest", x, y)
 ]]
-
-graphic_code_channel:push(rendercode)
 
 local function init()
    i18n.set('en.welcome', 'welcome to this program')
@@ -103,7 +114,17 @@ while true do
    dt = nt - time
    time = nt
 
-   if draw_ready_channel:peek() then
+   local is_ready = draw_ready_channel:peek()
+   if is_ready then
+      if type(is_ready) ~= 'string' then
+         error("Type error in is_ready flag")
+      end
+      if is_ready ~= "ready" then
+         local msg = tostring(is_ready) or ""
+         error("Bad message in draw_ready_channel: " .. msg)
+      end
+      draw_ready_channel:pop()
+
 
 
 
@@ -116,10 +137,13 @@ while true do
       graphic_command_channel:push(y)
       graphic_command_channel:push(x)
 
-      local res = draw_ready_channel:pop()
-      if res ~= "ready" then
-         error("Bad message in draw_ready_channel: " .. res)
-      end
+
+
+
+
+
+
+
    end
 
    love.timer.sleep(0.001)
