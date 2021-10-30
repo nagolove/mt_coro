@@ -1,4 +1,5 @@
 print('hello. I scene from separated thread')
+print('hello. I scene from separated thread')
 
 --local tl = require "tl"
 require "love"
@@ -35,11 +36,78 @@ local dt = 0.
 local type Pipeline = record
     new: function(): Pipeline
     -- Вход в секцию отправки
-    enter: function(Pipeline)
+    enter: function(Pipeline, name: string)
     -- Затолкать данные в канал
     push: function(Pipeline, any)
     -- Завершение секции отправки
     leave: function(Pipeline)
+
+    -- Отправить имя функции для рисования.
+    pushName: function(Pipeline, name: string)
+
+    -- Начать отправку данных. 
+    -- Блокирующий вызов(синхронизация с потоком рисования.
+    ready: function(Pipeline): boolean
+
+    pushCode: function(Pipeline, name: string, code: string)
+end
+
+local Pipeline_mt: metatable<Pipeline> = {
+    __index = Pipeline,
+}
+
+function Pipeline.new(): Pipeline
+    local self: Pipeline = setmetatable({} as Pipeline, Pipeline_mt)
+    return self
+end
+
+function Pipeline:enter(_: string)
+
+end
+
+function Pipeline:leave()
+
+end
+
+function Pipeline:pushName(_: string)
+
+end
+
+function Pipeline:push(_: any)
+
+end
+
+function Pipeline:ready(): boolean
+    local is_ready: string = draw_ready_channel:peek() as string
+    if is_ready then
+        if type(is_ready) ~= 'string' then
+            print("Type error in is_ready flag")
+            -- Переписать коды возврата в константы.
+            os.exit(250)
+        end
+        if is_ready ~= "ready" then
+            local msg = tostring(is_ready) or ""
+            print("Bad message in draw_ready_channel: " .. msg)
+            -- Переписать коды возврата в константы.
+            os.exit(249)
+        end
+        draw_ready_channel:pop()
+        return true
+    end
+    return false
+end
+
+-- Не лучше-ли передавать число?
+function pushCode(name: string, code: string)
+    if not name then
+        error("No name for pushCode()")
+    end
+    if not code then
+        error("No code for pushCode()")
+    end
+
+    graphic_code_channel:push(name)
+    graphic_code_channel:push(code)
 end
 
 local pipeline = Pipeline.new()
@@ -51,12 +119,14 @@ local pipeline = Pipeline.new()
 -- Сейчас функция компилируется один раз при загрузке файла исходного текста
 -- потока.
 local rendercode = [[
+-- Как пропихнуть глобальную переменную?
+
 local s: integer = 1
 -- Как понять, что используются данные из нужного потока?
 local y = graphic_command_channel:demand()
 local x = graphic_command_channel:demand()
 
---local z
+--delkwffj
 --z = 1
 --z = "hi"
 
@@ -65,8 +135,6 @@ gr.clear(0.5, 0.5, 0.5)
 gr.setColor{0, 0, 0}
 gr.print("TestTest", x, y)
 ]]
-
-graphic_code_channel:push(rendercode)
 
 local function init()
     i18n.set('en.welcome', 'welcome to this program')
@@ -82,12 +150,15 @@ local function init()
     })
     print("translated", i18n.translate('welcome'))
     print("translated", i18n('welcome'))
+
     graphic_code_channel:push(rendercode)
+    -- pipeline:pushCode('circle', rendercode)
 end
 
 init()
 
 while true do
+    --print('mainloop iter')
     local events = event_channel:pop() as {any}
     if events then
         for _, e in ipairs(events) do
@@ -116,7 +187,9 @@ while true do
     dt = nt - time
     time = nt
 
-    if draw_ready_channel:peek() then
+
+    if pipeline:ready() then
+
         -- Как передавать данные?
         --graphic_command_channel:push({ mx, my })
         --graphic_command_channel:push(tostring( math.floor( 1 / dt ) ) )
@@ -127,19 +200,23 @@ while true do
         -- определенной функцией рисования и порядком вызова всех функций
         -- рисования в кадре?
         graphic_command_channel:push(y)
+
+        -- Если данные отправляются вне секции отправки, 
+        -- то генерировать ошибку.
         graphic_command_channel:push(x)
 
         --[[
-        pipeline:enter()
+
+        -- Создание и отправка блока данных
+        pipeline:enter('cursor')
         pipeline:push(y)
         pipeline:push(x)
         pipeline:leave()
+
+        -- Отправка только имени функции для рисования
+        pipeline:pushName('background')
         --]]
 
-        local res = draw_ready_channel:pop() as string
-        if res ~= "ready" then
-            error("Bad message in draw_ready_channel: " .. res)
-        end
     end
 
     love.timer.sleep(0.001)
