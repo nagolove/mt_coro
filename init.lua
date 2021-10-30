@@ -43,6 +43,10 @@ local s: integer = 1
 local y = graphic_command_channel:demand()
 local x = graphic_command_channel:demand()
 
+local z
+z = 1
+z = "hi"
+
 local gr = love.graphics
 gr.clear(0.5, 0.5, 0.5)
 gr.setColor{0, 0, 0}
@@ -105,6 +109,10 @@ while true do
 
 
       local x, y = love.mouse.getPosition()
+
+
+
+
       graphic_command_channel:push(y)
       graphic_command_channel:push(x)
 

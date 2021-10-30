@@ -32,6 +32,18 @@ local mx, my = 0, 0
 local time = love.timer.getTime()
 local dt = 0.
 
+local type Pipeline = record
+    new: function(): Pipeline
+    -- Вход в секцию отправки
+    enter: function(Pipeline)
+    -- Затолкать данные в канал
+    push: function(Pipeline, any)
+    -- Завершение секции отправки
+    leave: function(Pipeline)
+end
+
+local pipeline = Pipeline.new()
+
 -- Как часто перекомпилировать код рисовки?
 -- Варианты - 
 --  * по таймеру
@@ -40,8 +52,13 @@ local dt = 0.
 -- потока.
 local rendercode = [[
 local s: integer = 1
+-- Как понять, что используются данные из нужного потока?
 local y = graphic_command_channel:demand()
 local x = graphic_command_channel:demand()
+
+--local z
+--z = 1
+--z = "hi"
 
 local gr = love.graphics
 gr.clear(0.5, 0.5, 0.5)
@@ -105,8 +122,19 @@ while true do
         --graphic_command_channel:push(tostring( math.floor( 1 / dt ) ) )
 
         local x, y = love.mouse.getPosition()
+
+        -- Связать как-то(bind) следущую пару положенных на стек чисел с
+        -- определенной функцией рисования и порядком вызова всех функций
+        -- рисования в кадре?
         graphic_command_channel:push(y)
         graphic_command_channel:push(x)
+
+        --[[
+        pipeline:enter()
+        pipeline:push(y)
+        pipeline:push(x)
+        pipeline:leave()
+        --]]
 
         local res = draw_ready_channel:pop() as string
         if res ~= "ready" then
