@@ -32,6 +32,18 @@ local mx, my = 0, 0
 local time = love.timer.getTime()
 local dt = 0.
 
+local Pipeline = {}
+
+
+
+
+
+
+
+
+
+local pipeline = Pipeline.new()
+
 
 
 
@@ -40,12 +52,13 @@ local dt = 0.
 
 local rendercode = [[
 local s: integer = 1
+-- Как понять, что используются данные из нужного потока?
 local y = graphic_command_channel:demand()
 local x = graphic_command_channel:demand()
 
-local z
-z = 1
-z = "hi"
+--local z
+--z = 1
+--z = "hi"
 
 local gr = love.graphics
 gr.clear(0.5, 0.5, 0.5)
@@ -115,6 +128,13 @@ while true do
 
       graphic_command_channel:push(y)
       graphic_command_channel:push(x)
+
+
+
+
+
+
+
 
       local res = draw_ready_channel:pop()
       if res ~= "ready" then
