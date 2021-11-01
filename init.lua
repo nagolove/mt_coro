@@ -58,13 +58,12 @@ local function init()
    print("translated", i18n('welcome'))
 
    local rendercode = [[
-    fdsf
     local y = graphic_command_channel:demand()
     local x = graphic_command_channel:demand()
     love.graphics.clear(0.5, 0.5, 0.5)
     love.graphics.setColor{0, 0, 0}
     love.graphics.print("TestTest", x, y)
-    ]]
+    --]]
    pipeline:pushCode('test', rendercode)
 
 end
@@ -113,11 +112,11 @@ while true do
 
 
 
+
+
       pipeline:push(y)
-
-
-
       pipeline:push(x)
+
 
 
 
