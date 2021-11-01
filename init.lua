@@ -1,9 +1,9 @@
-local _tl_compat; if (tonumber((_VERSION or ''):match('[%d.]*$')) or 0) < 5.3 then local p, m = pcall(require, 'compat53.module'); if p then _tl_compat = m end end; local ipairs = _tl_compat and _tl_compat.ipairs or ipairs; local math = _tl_compat and _tl_compat.math or math; local os = _tl_compat and _tl_compat.os or os; print('hello. I scene from separated thread')
-print('hello. I scene from separated thread')
+local _tl_compat; if (tonumber((_VERSION or ''):match('[%d.]*$')) or 0) < 5.3 then local p, m = pcall(require, 'compat53.module'); if p then _tl_compat = m end end; local ipairs = _tl_compat and _tl_compat.ipairs or ipairs; local math = _tl_compat and _tl_compat.math or math; print('hello. I scene from separated thread')
 
 
 require("love")
 require("love_inc").require()
+require('pipeline')
 
 
 
@@ -24,91 +24,14 @@ local i18n = require("i18n")
 
 
 local event_channel = love.thread.getChannel("event_channel")
-local draw_ready_channel = love.thread.getChannel("draw_ready_channel")
-local graphic_command_channel = love.thread.getChannel("graphic_command_channel")
+
+
 local graphic_code_channel = love.thread.getChannel("graphic_code_channel")
 
 local mx, my = 0, 0
 
 local time = love.timer.getTime()
 local dt = 0.
-
-local Pipeline = {}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-local Pipeline_mt = {
-   __index = Pipeline,
-}
-
-function Pipeline.new()
-   local self = setmetatable({}, Pipeline_mt)
-   return self
-end
-
-function Pipeline:enter(_)
-
-end
-
-function Pipeline:leave()
-
-end
-
-function Pipeline:pushName(_)
-
-end
-
-function Pipeline:push(_)
-
-end
-
-function Pipeline:ready()
-   local is_ready = draw_ready_channel:peek()
-   if is_ready then
-      if type(is_ready) ~= 'string' then
-         print("Type error in is_ready flag")
-
-         os.exit(250)
-      end
-      if is_ready ~= "ready" then
-         local msg = tostring(is_ready) or ""
-         print("Bad message in draw_ready_channel: " .. msg)
-
-         os.exit(249)
-      end
-      draw_ready_channel:pop()
-      return true
-   end
-   return false
-end
-
-
-function pushCode(name, code)
-   if not name then
-      error("No name for pushCode()")
-   end
-   if not code then
-      error("No code for pushCode()")
-   end
-
-   graphic_code_channel:push(name)
-   graphic_code_channel:push(code)
-end
 
 local pipeline = Pipeline.new()
 
@@ -199,11 +122,11 @@ while true do
 
 
 
-      graphic_command_channel:push(y)
+      pipeline:push(y)
 
 
 
-      graphic_command_channel:push(x)
+      pipeline:push(x)
 
 
 
