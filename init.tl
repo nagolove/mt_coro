@@ -41,23 +41,6 @@ local pipeline = Pipeline.new()
 --  * используя метод :peek() на каждой итерации цикла
 -- Сейчас функция компилируется один раз при загрузке файла исходного текста
 -- потока.
-local rendercode = [[
--- Как пропихнуть глобальную переменную?
-
-local s: integer = 1
--- Как понять, что используются данные из нужного потока?
-local y = graphic_command_channel:demand()
-local x = graphic_command_channel:demand()
-
---delkwffj
---z = 1
---z = "hi"
-
-local gr = love.graphics
-gr.clear(0.5, 0.5, 0.5)
-gr.setColor{0, 0, 0}
-gr.print("TestTest", x, y)
-]]
 
 local function init()
     i18n.set('en.welcome', 'welcome to this program')
@@ -74,8 +57,16 @@ local function init()
     print("translated", i18n.translate('welcome'))
     print("translated", i18n('welcome'))
 
-    graphic_code_channel:push(rendercode)
-    -- pipeline:pushCode('circle', rendercode)
+    local rendercode = [[
+    fdsf
+    local y = graphic_command_channel:demand()
+    local x = graphic_command_channel:demand()
+    love.graphics.clear(0.5, 0.5, 0.5)
+    love.graphics.setColor{0, 0, 0}
+    love.graphics.print("TestTest", x, y)
+    ]]
+    pipeline:pushCode('test', rendercode)
+    --graphic_code_channel:push(rendercode)
 end
 
 init()
