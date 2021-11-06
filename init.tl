@@ -25,8 +25,8 @@ local i18n = require "i18n"
 
 local event_channel = love.thread.getChannel("event_channel")
 --local draw_ready_channel = love.thread.getChannel("draw_ready_channel")
---local graphic_command_channel = love.thread.getChannel("graphic_command_channel")
-local graphic_code_channel = love.thread.getChannel("graphic_code_channel")
+local graphic_command_channel = love.thread.getChannel("graphic_command_channel")
+--local graphic_code_channel = love.thread.getChannel("graphic_code_channel")
 
 local mx, my = 0, 0
 
