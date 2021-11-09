@@ -25,7 +25,7 @@ local i18n = require("i18n")
 
 local event_channel = love.thread.getChannel("event_channel")
 
-local graphic_command_channel = love.thread.getChannel("graphic_command_channel")
+
 
 
 local mx, my = 0, 0
@@ -107,16 +107,18 @@ while true do
 
 
 
-      local x, y = love.mouse.getPosition()
+
+      local x, y = 101, 102
+      print('x, y', x, y)
 
 
 
 
 
-
+      pipeline:enter('test')
       pipeline:push(y)
       pipeline:push(x)
-
+      pipeline:leave()
 
 
 

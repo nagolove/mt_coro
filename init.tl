@@ -25,7 +25,7 @@ local i18n = require "i18n"
 
 local event_channel = love.thread.getChannel("event_channel")
 --local draw_ready_channel = love.thread.getChannel("draw_ready_channel")
-local graphic_command_channel = love.thread.getChannel("graphic_command_channel")
+--local graphic_command_channel = love.thread.getChannel("graphic_command_channel")
 --local graphic_code_channel = love.thread.getChannel("graphic_code_channel")
 
 local mx, my = 0, 0
@@ -107,16 +107,18 @@ while true do
         --graphic_command_channel:push({ mx, my })
         --graphic_command_channel:push(tostring( math.floor( 1 / dt ) ) )
 
-        local x, y = love.mouse.getPosition()
+        ----local x, y = love.mouse.getPosition()
+        local x, y = 101, 102
+        print('x, y', x, y)
 
         -- Связать как-то(bind) следущую пару положенных на стек чисел с
         -- определенной функцией рисования и порядком вызова всех функций
         -- рисования в кадре?
 
-        --pipeline:enter('test')
+        pipeline:enter('test')
         pipeline:push(y)
         pipeline:push(x)
-        --pipeline:leave()
+        pipeline:leave()
 
         --[[
 
