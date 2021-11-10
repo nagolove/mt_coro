@@ -58,14 +58,24 @@ local function init()
    print("translated", i18n('welcome'))
 
    local rendercode = [[
-    local y = graphic_command_channel:demand()
-    local x = graphic_command_channel:demand()
-    love.graphics.clear(0.5, 0.5, 0.5)
+    --local y = graphic_command_channel:demand()
+    --local x = graphic_command_channel:demand()
+    --local x, y = 100, 100
+    local w, h = love.graphics.getDimensions()
+    local x, y = math.random() * w, math.random() * h
     love.graphics.setColor{0, 0, 0}
     love.graphics.print("TestTest", x, y)
     --]]
-   pipeline:pushCode('test', rendercode)
+   pipeline:pushCode('text', rendercode)
 
+   rendercode = [[
+    local y = graphic_command_channel:demand()
+    local x = graphic_command_channel:demand()
+    local rad = graphic_command_channel:demand()
+    love.graphics.setColor{0, 0, 0}
+    love.graphics.circle('fill', x, y, rad)
+    --]]
+   pipeline:pushCode('circle_under_mouse', rendercode)
 end
 
 init()
@@ -108,29 +118,36 @@ while true do
 
 
 
-      local x, y = 101, 102
-      print('x, y', x, y)
+
+
+      pipeline:openAndClose('clear')
+
+      pipeline:open('text')
+      pipeline:close()
 
 
 
 
 
-      pipeline:enter('test')
-      pipeline:push(y)
+
+
+
+
+
+
+
+
+
+
+
+
+      local x, y = love.mouse.getPosition()
+      local rad = 50
+      pipeline:open('circle_under_mouse')
       pipeline:push(x)
-      pipeline:leave()
-
-
-
-
-
-
-
-
-
-
-
-
+      pipeline:push(y)
+      pipeline:push(rad)
+      pipeline:close()
 
    end
 

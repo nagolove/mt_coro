@@ -58,14 +58,24 @@ local function init()
     print("translated", i18n('welcome'))
 
     local rendercode = [[
-    local y = graphic_command_channel:demand()
-    local x = graphic_command_channel:demand()
-    love.graphics.clear(0.5, 0.5, 0.5)
+    --local y = graphic_command_channel:demand()
+    --local x = graphic_command_channel:demand()
+    --local x, y = 100, 100
+    local w, h = love.graphics.getDimensions()
+    local x, y = math.random() * w, math.random() * h
     love.graphics.setColor{0, 0, 0}
     love.graphics.print("TestTest", x, y)
     --]]
-    pipeline:pushCode('test', rendercode)
-    --graphic_code_channel:push(rendercode)
+    pipeline:pushCode('text', rendercode)
+
+    rendercode = [[
+    local y = graphic_command_channel:demand()
+    local x = graphic_command_channel:demand()
+    local rad = graphic_command_channel:demand()
+    love.graphics.setColor{0, 0, 0}
+    love.graphics.circle('fill', x, y, rad)
+    --]]
+    pipeline:pushCode('circle_under_mouse', rendercode)
 end
 
 init()
@@ -107,30 +117,37 @@ while true do
         --graphic_command_channel:push({ mx, my })
         --graphic_command_channel:push(tostring( math.floor( 1 / dt ) ) )
 
-        ----local x, y = love.mouse.getPosition()
-        local x, y = 101, 102
-        print('x, y', x, y)
-
         -- Связать как-то(bind) следущую пару положенных на стек чисел с
         -- определенной функцией рисования и порядком вызова всех функций
         -- рисования в кадре?
+        pipeline:openAndClose('clear')
 
-        pipeline:enter('test')
-        pipeline:push(y)
-        pipeline:push(x)
-        pipeline:leave()
+        pipeline:open('text')
+        pipeline:close()
+
+        -- Как избежать случайных лишних заталкиваний данных в канал?
+        --pipeline:push(y)
+        --pipeline:push(x)
 
         --[[
 
         -- Создание и отправка блока данных
-        pipeline:enter('cursor')
+        pipeline:open('cursor')
         pipeline:push(y)
         pipeline:push(x)
-        pipeline:leave()
+        pipeline:close()
 
         -- Отправка только имени функции для рисования
         pipeline:pushName('background')
         --]]
+
+        local x, y = love.mouse.getPosition()
+        local rad = 50
+        pipeline:open('circle_under_mouse')
+        pipeline:push(x)
+        pipeline:push(y)
+        pipeline:push(rad)
+        pipeline:close()
 
     end
 
