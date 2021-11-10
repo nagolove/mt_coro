@@ -72,10 +72,14 @@ local function init()
     local y = graphic_command_channel:demand()
     local x = graphic_command_channel:demand()
     local rad = graphic_command_channel:demand()
-    love.graphics.setColor{0, 0, 0}
+    love.graphics.setColor{0, 0, 1}
     love.graphics.circle('fill', x, y, rad)
     --]]
     pipeline:pushCode('circle_under_mouse', rendercode)
+
+    -- Допустимо-ли переопределение функций? Или добавить специальный флаг?
+    -- Нормально-ли использовать константы?
+    pipeline:pushCode('clear', "love.graphics.clear{0.5, 0.5, 0.5}")
 end
 
 init()
@@ -112,34 +116,14 @@ while true do
 
 
     if pipeline:ready() then
+        -- Очередность доставки сообщений, нужна-ли?
+        -- Как устранить мерцание?
+        -- Причины мерцания.
 
-        -- Как передавать данные?
-        --graphic_command_channel:push({ mx, my })
-        --graphic_command_channel:push(tostring( math.floor( 1 / dt ) ) )
-
-        -- Связать как-то(bind) следущую пару положенных на стек чисел с
-        -- определенной функцией рисования и порядком вызова всех функций
-        -- рисования в кадре?
         pipeline:openAndClose('clear')
 
         pipeline:open('text')
         pipeline:close()
-
-        -- Как избежать случайных лишних заталкиваний данных в канал?
-        --pipeline:push(y)
-        --pipeline:push(x)
-
-        --[[
-
-        -- Создание и отправка блока данных
-        pipeline:open('cursor')
-        pipeline:push(y)
-        pipeline:push(x)
-        pipeline:close()
-
-        -- Отправка только имени функции для рисования
-        pipeline:pushName('background')
-        --]]
 
         local x, y = love.mouse.getPosition()
         local rad = 50

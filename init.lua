@@ -72,10 +72,14 @@ local function init()
     local y = graphic_command_channel:demand()
     local x = graphic_command_channel:demand()
     local rad = graphic_command_channel:demand()
-    love.graphics.setColor{0, 0, 0}
+    love.graphics.setColor{0, 0, 1}
     love.graphics.circle('fill', x, y, rad)
     --]]
    pipeline:pushCode('circle_under_mouse', rendercode)
+
+
+
+   pipeline:pushCode('clear', "love.graphics.clear{0.5, 0.5, 0.5}")
 end
 
 init()
@@ -111,45 +115,22 @@ while true do
    time = nt
 
 
-   if pipeline:ready() then
 
 
+   pipeline:openAndClose('clear')
+
+   pipeline:open('text')
+   pipeline:close()
+
+   local x, y = love.mouse.getPosition()
+   local rad = 50
+   pipeline:open('circle_under_mouse')
+   pipeline:push(x)
+   pipeline:push(y)
+   pipeline:push(rad)
+   pipeline:close()
 
 
-
-
-
-
-      pipeline:openAndClose('clear')
-
-      pipeline:open('text')
-      pipeline:close()
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-      local x, y = love.mouse.getPosition()
-      local rad = 50
-      pipeline:open('circle_under_mouse')
-      pipeline:push(x)
-      pipeline:push(y)
-      pipeline:push(rad)
-      pipeline:close()
-
-   end
 
    love.timer.sleep(0.001)
 end
