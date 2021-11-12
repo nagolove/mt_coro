@@ -63,7 +63,7 @@ local function init()
     local x, y = math.random() * w, math.random() * h
     love.graphics.setColor{0, 0, 0}
     love.graphics.print("TestTest", x, y)
-    --]]
+    ]]
     pipeline:pushCode('text', rendercode)
 
     rendercode = [[
@@ -72,21 +72,31 @@ local function init()
     local rad = graphic_command_channel:demand()
     love.graphics.setColor{0, 0, 1}
     love.graphics.circle('fill', x, y, rad)
-    --]]
+    ]]
     pipeline:pushCode('circle_under_mouse', rendercode)
 
     -- Допустимо-ли переопределение функций? Или добавить специальный флаг?
     -- Нормально-ли использовать константы?
     pipeline:pushCode('clear', "love.graphics.clear{0.5, 0.5, 0.5}")
 
+    --[[
+    -- Добавлять-ли такую функцию? Будет использоваться?
+    -- Стоимость реализации и возможности применения.
+    pipeline:pushCodes({
+        { 
+            'text',
+            'code',
+        },
+        {},
+        {},
+    })
+    --]]
+
     last_render = love.timer.getTime()
 end
 
 local function render()
     if pipeline:ready() then
-        -- Очередность доставки сообщений, нужна-ли?
-        -- Как устранить мерцание?
-        -- Причины мерцания.
 
         pipeline:openAndClose('clear')
 
@@ -131,21 +141,26 @@ local function mainloop()
             end
         end
         
+        --[[
         local nt = love.timer.getTime()
-        local pause = 1. / 60.
         --local pause = 1. / 10.
+        local pause = 1. / 300.
         if nt - last_render >= pause then
             last_render = nt
-            local msg = 'love.timer.getTime() = %f'
-            print(colorize('%{blue}' .. format(msg, love.timer.getTime())))
+            --local msg = 'love.timer.getTime() = %f'
+            --print(colorize('%{blue}' .. format(msg, love.timer.getTime())))
             render()
         end
+        --]]
+
+        render()
 
         --[[
         Ограничение кадров в секунду до 60
         --]]
 
-        love.timer.sleep(0.001)
+        --love.timer.sleep(0.0008)
+        love.timer.sleep(0.0001)
     end
 end
 
