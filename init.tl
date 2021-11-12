@@ -9,6 +9,8 @@ require 'pipeline'
 
 love.filesystem.setRequirePath("?.lua;?/init.lua;scenes/empty/?.lua")
 local i18n = require "i18n"
+local colorize = require 'ansicolors2'.ansicolors
+local format = string.format
 
 --require "external"
 --require "common"
@@ -30,8 +32,7 @@ local event_channel = love.thread.getChannel("event_channel")
 
 local mx, my = 0, 0
 
-local time = love.timer.getTime()
-local dt = 0.
+local last_render: number
 
 local pipeline = Pipeline.new()
 
@@ -58,9 +59,6 @@ local function init()
     print("translated", i18n('welcome'))
 
     local rendercode = [[
-    --local y = graphic_command_channel:demand()
-    --local x = graphic_command_channel:demand()
-    --local x, y = 100, 100
     local w, h = love.graphics.getDimensions()
     local x, y = math.random() * w, math.random() * h
     love.graphics.setColor{0, 0, 0}
@@ -80,47 +78,17 @@ local function init()
     -- Допустимо-ли переопределение функций? Или добавить специальный флаг?
     -- Нормально-ли использовать константы?
     pipeline:pushCode('clear', "love.graphics.clear{0.5, 0.5, 0.5}")
+
+    last_render = love.timer.getTime()
 end
 
-init()
-
-while true do
-    --print('mainloop iter')
-    local events = event_channel:pop() as {any}
-    if events then
-        for _, e in ipairs(events) do
-            local evtype: string = (e as {string})[1]
-            if evtype == "mousemoved" then
-                mx = math.floor((e as {number})[2])
-                my = math.floor((e as {number})[3])
-            elseif evtype == "keypressed" then
-                local key = (e as {string})[2]
-                local scancode = (e as {string})[3]
-                print('keypressed', key, scancode)
-                if scancode == "escape" then
-                    love.event.quit()
-                end
-            elseif evtype == "mousepressed" then
-                --local x: number = (e as {number})[2]
-                --local y: number = (e as {number})[3]
-                --local button: number = (e as {number})[4]
-                --local istouch: boolean = (e as {boolean})[5]
-                --local presses: number = (e as {number})[6]
-            end
-        end
-    end
-    
-    local nt = love.timer.getTime()
-    dt = nt - time
-    time = nt
-
-
+local function render()
     if pipeline:ready() then
         -- Очередность доставки сообщений, нужна-ли?
         -- Как устранить мерцание?
         -- Причины мерцания.
 
-        pipeline:openAndClose('clear')
+        --pipeline:openAndClose('clear')
 
         pipeline:open('text')
         pipeline:close()
@@ -128,22 +96,60 @@ while true do
         local x, y = love.mouse.getPosition()
         local rad = 50
         pipeline:open('circle_under_mouse')
-        pipeline:push(x)
         pipeline:push(y)
+        pipeline:push(x)
         pipeline:push(rad)
         pipeline:close()
 
     end
-
-    love.timer.sleep(0.001)
 end
 
---[[
-local function keypressed(key: string)
-    if key == "escape" then
-        love.event.quit()
+local function mainloop()
+    while true do
+        --print('mainloop iter')
+        local events = event_channel:pop() as {any}
+        if events then
+            for _, e in ipairs(events) do
+                local evtype: string = (e as {string})[1]
+                if evtype == "mousemoved" then
+                    mx = math.floor((e as {number})[2])
+                    my = math.floor((e as {number})[3])
+                elseif evtype == "keypressed" then
+                    local key = (e as {string})[2]
+                    local scancode = (e as {string})[3]
+                    print('keypressed', key, scancode)
+                    if scancode == "escape" then
+                        love.event.quit()
+                    end
+                elseif evtype == "mousepressed" then
+                    --local x: number = (e as {number})[2]
+                    --local y: number = (e as {number})[3]
+                    --local button: number = (e as {number})[4]
+                    --local istouch: boolean = (e as {boolean})[5]
+                    --local presses: number = (e as {number})[6]
+                end
+            end
+        end
+        
+        local nt = love.timer.getTime()
+        local pause = 1. / 60.
+        --local pause = 1. / 10.
+        if nt - last_render >= pause then
+            last_render = nt
+            local msg = 'love.timer.getTime() = %f'
+            print(colorize('%{blue}' .. format(msg, love.timer.getTime())))
+            render()
+        end
+
+        --[[
+        Ограничение кадров в секунду до 60
+        --]]
+
+        love.timer.sleep(0.001)
     end
 end
---]]
+
+init()
+mainloop()
 
 print('goodbye. I scene from separated thread')
