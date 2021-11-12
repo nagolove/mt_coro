@@ -88,7 +88,7 @@ local function render()
 
 
 
-
+      pipeline:openAndClose('clear')
 
       pipeline:open('text')
       pipeline:close()

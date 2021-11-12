@@ -88,7 +88,7 @@ local function render()
         -- Как устранить мерцание?
         -- Причины мерцания.
 
-        --pipeline:openAndClose('clear')
+        pipeline:openAndClose('clear')
 
         pipeline:open('text')
         pipeline:close()
