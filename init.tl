@@ -7,10 +7,10 @@ require 'pipeline'
 
 --require "love.timer"
 
-love.filesystem.setRequirePath("?.lua;?/init.lua;scenes/empty/?.lua")
+love.filesystem.setRequirePath("?.lua;?/init.lua;scenes/empty_mt/?.lua")
 local i18n = require "i18n"
-local colorize = require 'ansicolors2'.ansicolors
-local format = string.format
+--local colorize = require 'ansicolors2'.ansicolors
+--local format = string.format
 
 --require "external"
 --require "common"
