@@ -141,7 +141,6 @@ local function mainloop()
             end
         end
         
-        --[[
         local nt = love.timer.getTime()
         --local pause = 1. / 10.
         local pause = 1. / 300.
@@ -153,7 +152,7 @@ local function mainloop()
         end
         --]]
 
-        render()
+        --render()
 
         --[[
         Ограничение кадров в секунду до 60

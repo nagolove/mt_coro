@@ -1,4 +1,4 @@
-local _tl_compat; if (tonumber((_VERSION or ''):match('[%d.]*$')) or 0) < 5.3 then local p, m = pcall(require, 'compat53.module'); if p then _tl_compat = m end end; local ipairs = _tl_compat and _tl_compat.ipairs or ipairs; local math = _tl_compat and _tl_compat.math or math; local string = _tl_compat and _tl_compat.string or string; print('hello. I scene from separated thread')
+local _tl_compat; if (tonumber((_VERSION or ''):match('[%d.]*$')) or 0) < 5.3 then local p, m = pcall(require, 'compat53.module'); if p then _tl_compat = m end end; local ipairs = _tl_compat and _tl_compat.ipairs or ipairs; local math = _tl_compat and _tl_compat.math or math; print('hello. I scene from separated thread')
 
 
 require("love")
@@ -7,10 +7,10 @@ require('pipeline')
 
 
 
-love.filesystem.setRequirePath("?.lua;?/init.lua;scenes/empty/?.lua")
+love.filesystem.setRequirePath("?.lua;?/init.lua;scenes/empty_mt/?.lua")
 local i18n = require("i18n")
-local colorize = require('ansicolors2').ansicolors
-local format = string.format
+
+
 
 
 
@@ -141,19 +141,18 @@ local function mainloop()
          end
       end
 
+      local nt = love.timer.getTime()
+
+      local pause = 1. / 300.
+      if nt - last_render >= pause then
+         last_render = nt
+
+
+         render()
+      end
 
 
 
-
-
-
-
-
-
-
-
-
-      render()
 
 
 
