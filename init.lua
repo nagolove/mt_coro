@@ -7,7 +7,7 @@ require('pipeline')
 
 
 
-love.filesystem.setRequirePath("?.lua;?/init.lua;scenes/empty_mt/?.lua")
+love.filesystem.setRequirePath("?.lua;?/init.lua;scenes/mt_coro/?.lua")
 local i18n = require("i18n")
 
 
@@ -59,25 +59,36 @@ local function init()
    print("translated", i18n('welcome'))
 
    local rendercode = [[
-    local w, h = love.graphics.getDimensions()
-    local x, y = math.random() * w, math.random() * h
-    love.graphics.setColor{0, 0, 0}
-    love.graphics.print("TestTest", x, y)
+    while true do
+        local w, h = love.graphics.getDimensions()
+        local x, y = math.random() * w, math.random() * h
+        love.graphics.setColor{0, 0, 0}
+        love.graphics.print("TestTest", x, y)
+        coroutine.yield()
+    end
     ]]
    pipeline:pushCode('text', rendercode)
 
    rendercode = [[
-    local y = graphic_command_channel:demand()
-    local x = graphic_command_channel:demand()
-    local rad = graphic_command_channel:demand()
-    love.graphics.setColor{0, 0, 1}
-    love.graphics.circle('fill', x, y, rad)
+    while true do
+        local y = graphic_command_channel:demand()
+        local x = graphic_command_channel:demand()
+        local rad = graphic_command_channel:demand()
+        love.graphics.setColor{0, 0, 1}
+        love.graphics.circle('fill', x, y, rad)
+        coroutine.yield()
+    end
     ]]
    pipeline:pushCode('circle_under_mouse', rendercode)
 
 
 
-   pipeline:pushCode('clear', "love.graphics.clear{0.5, 0.5, 0.5}")
+   pipeline:pushCode('clear', [[
+    repeat
+        love.graphics.clear{0.5, 0.5, 0.5}
+        coroutine.yield()
+    until false
+    ]])
 
 
 
