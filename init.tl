@@ -34,7 +34,7 @@ local mx, my = 0, 0
 
 local last_render: number
 
-local pipeline = Pipeline.new()
+local pipeline = Pipeline.new('scenes/mt_coro')
 
 -- Как часто перекомпилировать код рисовки?
 -- Варианты - 
@@ -90,6 +90,18 @@ local function init()
     until false
     ]])
 
+    pipeline:pushCode('tank_sprite', [[
+        local img = love.graphics.newImage(SCENE_PREFIX .. '/korpus1.png')
+        local color = {1, 1, 1, 1}
+        while true do
+            local x = graphic_command_channel:demand()
+            local y = graphic_command_channel:demand()
+            love.graphics.setColor(color)
+            love.graphics.draw(img, x, y)
+            coroutine.yield()
+        end
+    ]])
+
     --[[
     -- Добавлять-ли такую функцию? Будет использоваться?
     -- Стоимость реализации и возможности применения.
@@ -105,6 +117,8 @@ local function init()
 
     last_render = love.timer.getTime()
 end
+
+local tank_x, tank_y = 0., 0.
 
 local function render()
     if pipeline:ready() then
@@ -122,8 +136,14 @@ local function render()
         pipeline:push(rad)
         pipeline:close()
 
+        pipeline:open('tank_sprite')
+        pipeline:push(tank_x)
+        pipeline:push(tank_y)
+        pipeline:close()
     end
 end
+
+local isDown = love.keyboard.isDown
 
 local function mainloop()
     while true do
@@ -136,9 +156,8 @@ local function mainloop()
                     mx = math.floor((e as {number})[2])
                     my = math.floor((e as {number})[3])
                 elseif evtype == "keypressed" then
-                    local key = (e as {string})[2]
+                    --local key = (e as {string})[2]
                     local scancode = (e as {string})[3]
-                    print('keypressed', key, scancode)
                     if scancode == "escape" then
                         love.event.quit()
                     end
@@ -150,6 +169,20 @@ local function mainloop()
                     --local presses: number = (e as {number})[6]
                 end
             end
+        end
+
+        local d = 1
+        if isDown('left') then
+            tank_x = tank_x - d
+        end
+        if isDown('right') then
+            tank_x = tank_x + d
+        end
+        if isDown('up') then
+            tank_y = tank_y - d
+        end
+        if isDown('down') then
+            tank_y = tank_y + d
         end
         
         local nt = love.timer.getTime()
